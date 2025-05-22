@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 # Ruta a carpeta del frontend
-frontend_path = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+frontend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../frontend'))
 
 # Montar rutas estáticas (css, js) después de definir el path
 app.mount("/css", StaticFiles(directory=os.path.join(frontend_path, "css")), name="css")
