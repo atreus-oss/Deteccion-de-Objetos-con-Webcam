@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from video_stream import router as video_router
 from fastapi.responses import JSONResponse
 
 app = FastAPI()
@@ -26,8 +25,6 @@ status = {
     "others": 0,
     "fps": 0
 }
-
-app.include_router(video_router)
 
 @app.get("/")
 def root():
