@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 # Cargar variables de entorno desde .env
 load_dotenv()
@@ -31,15 +32,17 @@ status = {
     "fps": 0
 }
 
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
+
 # Ruta principal
 @app.get("/")
-def root():
-    return {"message": "API de detección funcionando. Usa /api/stats para obtener datos."}
+def read_index():
+    return FileResponse("frontend/index.html")
 
 # Obtener estado actual
 @app.get("/api/stats")
-def get_stats():
-    return status
+def stats():
+    return {"message": "API de detección funcionando. Usa /api/stats para obtener datos."}
 
 # Modelo para actualizar estado
 class StatsUpdate(BaseModel):
