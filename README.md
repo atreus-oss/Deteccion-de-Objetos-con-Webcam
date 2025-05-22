@@ -9,13 +9,9 @@ Este proyecto detecta personas, vehículos y otros objetos en tiempo real desde 
 │   │
 │   ├── Detector.py
 │   │
-│   ├── detector_runner.py
-│   │
 │   ├── main.py
 │   │
 │   ├── render.yaml
-│   │
-│   ├── video_stream.py
 │   │
 │   └── model_data/
 │       │
@@ -24,10 +20,6 @@ Este proyecto detecta personas, vehículos y otros objetos en tiempo real desde 
 │       ├── ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt
 │       │
 │       └── coco.names
-│
-│   └── test_video/
-│       │
-│       └── street.mp4
 │
 ├── frontend/
 │   │

@@ -5,7 +5,7 @@ import time
 import os
 
 # URL de la API para enviar resultados
-render_url = os.getenv("render_url", "http://localhost:8000/api/update")
+render_url = os.getenv("RENDER_URL", "http://localhost:8000/api/update")
 
 np.random.seed(20)
 
