@@ -1,8 +1,8 @@
 import cv2
 
 import numpy as np
-import time
-import requests
+from main import render_url
+import requests, time
 
 np.random.seed(20)
 class Detector:
@@ -102,7 +102,7 @@ class Detector:
                     ########################################################################################################################################
 
                     try:
-                        requests.post("http://localhost:8000/api/update", json={
+                        requests.post(render_url, json={
                             "person": counts["person"],
                             "vehicle": counts["vehicle"],
                             "others": counts["others"],
