@@ -1,0 +1,39 @@
+# Entornos virtuales
+venv/
+env/
+.venv/
+myenv/
+
+# Archivos de configuración del editor
+.vscode/
+.idea/
+*.code-workspace
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos compilados
+__pycache__/
+*.py[cod]
+*.so
+
+# Archivos de logs
+*.log
+
+# Datos de caché
+*.cache/
+*.egg-info/
+
+# Archivos de salida de video/imágenes
+*.avi
+*.mp4
+*.jpg
+*.png
+
+# Claves/API secrets (si los tienes en archivos)
+.env
+secrets.json
+
+# Archivos generados automáticamente
+

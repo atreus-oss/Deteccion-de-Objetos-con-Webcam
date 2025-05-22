@@ -1,0 +1,41 @@
+<!--Para ejecutar el html: python -m http.server 8080 // para acceder a él: http://localhost:8080/index.html-->
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Monitor de Detección</title>
+        <link rel="stylesheet" href="/css/index.css">
+    </head>
+    <body>
+        <header>Monitoreo de Detección de Objetos</header>
+        <div class="stats">
+            <div class="card">
+                <h3>Personas</h3>
+                <p id="personCount">0</p>
+            </div>
+            <div class="card">
+                <h3>Vehículos</h3>
+                <p id="vehicleCount">0</p>
+            </div>
+            <div class="card">
+                <h3>Otros</h3>
+                <p id="othersCount">0</p>
+            </div>
+            <div class="card">
+                <h3>FPS</h3>
+                <p id="fpsCount">0</p>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <h3>Video en vivo desde cámara</h3>
+            <img src="http://localhost:8000/video_feed" style="max-width: 90%; border: 2px solid #333;" />
+        </div>
+
+
+        <div id="errorMsg" style="color: red; font-weight: bold;"></div>
+
+        <script src="/js/script.js"></script>
+    </body>
+</html>
