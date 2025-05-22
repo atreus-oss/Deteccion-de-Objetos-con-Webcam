@@ -18,6 +18,8 @@ fetch("/api/url")
     document.getElementById("errorMsg").textContent = "Error al obtener la URL del backend.";
   });
 
+document.getElementById("camFeed").src = apiUrlBase + "/video_feed";
+
 navigator.mediaDevices.getUserMedia({ video: true })
   .then(function(stream) {
     const video = document.querySelector("video");

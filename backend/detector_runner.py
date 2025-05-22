@@ -1,12 +1,19 @@
 from Detector import Detector
-import cv2
-import os
+import cv2, os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def main():
-    # Configuraciones del modelo
-    configPath = os.path.join("model_data", "ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt")
-    modelPath = os.path.join("model_data", "frozen_inference_graph.pb")
-    classesPath = os.path.join("model_data", "coco.names")
+    # Configuraciones del modelo (cargadas desde .env)
+    configPath = os.getenv("MODEL_CONFIG_PATH")
+    modelPath = os.getenv("MODEL_WEIGHTS_PATH")
+    classesPath = os.getenv("MODEL_CLASSES_PATH")
+
+    # Validar rutas
+    if not all([configPath, modelPath, classesPath]):
+        print("Error: Faltan rutas del modelo en el archivo .env")
+        return
 
     detector = Detector(configPath, modelPath, classesPath)
 
