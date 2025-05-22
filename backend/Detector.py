@@ -61,20 +61,9 @@ class Detector:
         endTime = time.time()
         fps = 1 / (endTime - startTime)
 
-        # Enviar resultados al backend (opcional)
-        try:
-            requests.post(render_url, json={
-                "person": counts["person"],
-                "vehicle": counts["vehicle"],
-                "others": counts["others"],
-                "fps": round(fps, 2)
-            })
-        except Exception as e:
-            print("Error enviando datos al API:", e)
-
-        return {
+        requests.post(render_url, json={
             "person": counts["person"],
             "vehicle": counts["vehicle"],
             "others": counts["others"],
             "fps": round(fps, 2)
-        }
+        })
