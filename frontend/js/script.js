@@ -1,52 +1,59 @@
 let apiUrlBase = null;
 
 fetch("/api/url")
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error("No se pudo obtener /api/url");
+    return res.json();
+  })
   .then(data => {
     apiUrlBase = data.url;
+
+    if (!apiUrlBase) {
+      throw new Error("La URL está vacía o indefinida");
+    }
+
     console.log("La URL segura es:", apiUrlBase);
 
-    //Cargar video dinámicamente
-   document.getElementById("camFeed").src = apiUrlBase + "/video_feed";
+    // No usamos /video_feed porque Render no tiene cámara
+    // document.getElementById("camFeed").src = apiUrlBase + "/video_feed";
 
-    //Iniciar stats
-    actualizarStats();
-    setInterval(actualizarStats, 1000);
+    actualizarStats(); // Primera carga
+    setInterval(actualizarStats, 1000); // Luego cada 1s
   })
   .catch(err => {
-    console.error("No se pudo obtener la URL segura:", err);
-    document.getElementById("errorMsg").textContent = "Error al obtener la URL del backend.";
+    console.error("Error al obtener la URL del backend:", err.message);
+    document.getElementById("errorMsg").textContent =
+      "Error al obtener la URL del backend.";
   });
 
-
 navigator.mediaDevices.getUserMedia({ video: true })
-  .then(function(stream) {
+  .then(function (stream) {
     const video = document.getElementById("camFeed");
     video.srcObject = stream;
   })
-  .catch(function(err) {
+  .catch(function (err) {
     console.log("No se pudo acceder a la cámara: ", err);
+    document.getElementById("errorMsg").textContent =
+      "No se pudo acceder a la cámara.";
   });
-
 
 async function actualizarStats() {
   if (!apiUrlBase) return;
 
   try {
     const res = await fetch(apiUrlBase + "/api/stats");
-    if (!res.ok) throw new Error('Error HTTP ' + res.status);
+    if (!res.ok) throw new Error("Error HTTP " + res.status);
+
     const data = await res.json();
 
     document.getElementById("personCount").textContent = data.person || 0;
     document.getElementById("vehicleCount").textContent = data.vehicle || 0;
     document.getElementById("othersCount").textContent = data.others || 0;
     document.getElementById("fpsCount").textContent = data.fps || 0;
-    document.getElementById("errorMsg").textContent = '';
+    document.getElementById("errorMsg").textContent = "";
   } catch (err) {
-    document.getElementById("errorMsg").textContent = 'Error al actualizar datos: ' + err.message;
-    console.error("Error al actualizar datos:", err);
+    console.error("Error al actualizar datos:", err.message);
+    document.getElementById("errorMsg").textContent =
+      "Error al actualizar datos: " + err.message;
   }
 }
-
-setInterval(actualizarStats, 1000);
-actualizarStats();
