@@ -7,7 +7,7 @@ fetch("/api/url")
     console.log("La URL segura es:", apiUrlBase);
 
     //Cargar video dinámicamente
-   // document.getElementById("camFeed").src = apiUrlBase + "/video_feed";
+   document.getElementById("camFeed").src = apiUrlBase + "/video_feed";
 
     //Iniciar stats
     actualizarStats();
