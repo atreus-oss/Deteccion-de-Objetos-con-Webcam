@@ -13,6 +13,8 @@ Este proyecto detecta personas, vehículos y otros objetos en tiempo real desde 
 │   │
 │   ├── main.py
 │   │
+│   ├── render.yaml
+│   │
 │   ├── video_stream.py
 │   │
 │   └── model_data/
