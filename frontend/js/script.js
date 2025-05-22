@@ -18,6 +18,16 @@ fetch("/api/url")
     document.getElementById("errorMsg").textContent = "Error al obtener la URL del backend.";
   });
 
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(function(stream) {
+    const video = document.querySelector("video");
+    video.srcObject = stream;
+  })
+  .catch(function(err) {
+    console.log("No se pudo acceder a la cámara: ", err);
+  });
+
+
 async function actualizarStats() {
   if (!apiUrlBase) return;
 

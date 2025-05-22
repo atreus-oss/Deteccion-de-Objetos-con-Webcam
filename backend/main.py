@@ -1,5 +1,3 @@
-# Ejecutar FastAPI: uvicorn main:app --host 0.0.0.0 --port 8000
-
 import os
 import requests
 from dotenv import load_dotenv
@@ -9,22 +7,34 @@ from pydantic import BaseModel
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
-# Cargar variables de entorno desde .env
+# Cargar variables de entorno
 load_dotenv()
 render_url = os.getenv("RENDER_URL")
 
-# Crear instancia de la app
+# Crear app FastAPI
 app = FastAPI()
 
-# Habilitar CORS (útil para frontend)
+# Activar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Cambiar por dominios específicos en producción
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Estado actual (memoria local)
+# Ruta a carpeta del frontend
+frontend_path = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+
+# Montar rutas estáticas (css, js) después de definir el path
+app.mount("/css", StaticFiles(directory=os.path.join(frontend_path, "css")), name="css")
+app.mount("/js", StaticFiles(directory=os.path.join(frontend_path, "js")), name="js")
+
+# Servir index.html desde /
+@app.get("/")
+async def root():
+    return FileResponse(os.path.join(frontend_path, "index.html"))
+
+# Estado simulado
 status = {
     "person": 0,
     "vehicle": 0,
@@ -32,26 +42,16 @@ status = {
     "fps": 0
 }
 
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
-
-# Ruta principal
-@app.get("/")
-def read_index():
-    return FileResponse("frontend/index.html")
-
-# Obtener estado actual
 @app.get("/api/stats")
 def stats():
-    return {"message": "API de detección funcionando. Usa /api/stats para obtener datos."}
+    return status
 
-# Modelo para actualizar estado
 class StatsUpdate(BaseModel):
     person: int
     vehicle: int
     others: int
     fps: float
 
-# Actualizar estado desde otro componente
 @app.post("/api/update")
 def update_stats(data: StatsUpdate):
     status.update({
@@ -62,14 +62,12 @@ def update_stats(data: StatsUpdate):
     })
     return {"message": "Actualizado correctamente"}
 
-# Obtener la URL configurada para el render
 @app.get("/api/url")
 def get_private_url():
     if not render_url:
         raise HTTPException(status_code=500, detail="Variable RENDER_URL no definida.")
     return JSONResponse(content={"url": render_url})
 
-# Consultar datos externos (ejemplo de fetch remoto)
 @app.get("/api/datos")
 def get_secure_data():
     if not render_url:
