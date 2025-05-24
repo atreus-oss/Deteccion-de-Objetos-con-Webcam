@@ -1,43 +1,25 @@
 import cv2
-import numpy as np
-import requests
 import time
+import requests
+import numpy as np
 import os
+from ultralytics import YOLO
 
-# URL de la API para enviar resultados
+# URL del backend FastAPI (Render o local)
 render_url = os.getenv("RENDER_URL", "http://localhost:8000/api/update")
 
-np.random.seed(20)
-
 class Detector:
-    def __init__(self, configPath, modelPath, classesPath):
-        self.configPath = configPath
-        self.modelPath = modelPath
-        self.classesPath = classesPath
+    def __init__(self, model_path):
+        self.model = YOLO(model_path)
 
-        self.net = cv2.dnn_DetectionModel(self.modelPath, self.configPath)
-        self.net.setInputSize(320, 320)
-        self.net.setInputScale(1.0 / 127.5)
-        self.net.setInputMean((127.5, 127.5, 127.5))
-        self.net.setInputSwapRB(True)
+        #Cargar clases de COCO (nombre de objetos)
+        self.classesList = self.model.names
+        self.colorList = np.random.uniform(0, 255, size=(len(self.classesList), 3))
 
-        self.readClasses()
+    def process_frame(self, frame):
+        start_time = time.time()
 
-    def readClasses(self):
-        with open(self.classesPath, 'r') as f:
-            self.classesList = f.read().splitlines()
-        self.colorList = np.random.uniform(low=0, high=255, size=(len(self.classesList), 3))
-
-    def process_frame(self, image):
-        startTime = time.time()
-
-        classLabelIDs, confidences, bboxs = self.net.detect(image, confThreshold=0.4)
-
-        bboxs = list(bboxs)
-        confidences = list(np.array(confidences).reshape(1, -1)[0])
-        confidences = list(map(float, confidences))
-
-        bboxIdx = cv2.dnn.NMSBoxes(bboxs, confidences, score_threshold=0.5, nms_threshold=0.2)
+        results = self.model(frame, stream=False)[0]
 
         counts = {
             "person": 0,
@@ -45,25 +27,62 @@ class Detector:
             "others": 0
         }
 
-        if len(bboxIdx) != 0:
-            for i in range(len(bboxIdx)):
-                idx = np.squeeze(bboxIdx[i])
-                classLabelID = np.squeeze(classLabelIDs[idx])
-                classLabel = self.classesList[classLabelID].lower()
+        for r in results.boxes:
+            class_id = int(r.cls[0])
+            conf = float(r.conf[0])
+            x1, y1, x2, y2 = map(int, r.xyxy[0])
 
-                if classLabel == "person":
-                    counts["person"] += 1
-                elif classLabel in ["car", "truck", "bus", "motorbike", "bicycle"]:
-                    counts["vehicle"] += 1
-                else:
-                    counts["others"] += 1
+            label = self.classesList[class_id].lower()
+            color = [int(c) for c in self.colorList[class_id]]
+            w, h = x2 - x1, y2 - y1
 
-        endTime = time.time()
-        fps = 1 / (endTime - startTime)
+            # Clasificación básica
+            if label == "person":
+                counts["person"] += 1
+            elif label in ["car", "truck", "bus", "motorbike", "bicycle"]:
+                counts["vehicle"] += 1
+            else:
+                counts["others"] += 1
 
-        requests.post(render_url, json={
+            # Dibujar rectángulo
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color=color, thickness=2)
+
+            # Etiqueta
+            cv2.putText(frame, f"{label} {conf:.2f}", (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+            # Esquinas decorativas
+            lw = min(int(w * 0.3), int(h * 0.3))
+            # Sup Izq
+            cv2.line(frame, (x1, y1), (x1 + lw, y1), color, 4)
+            cv2.line(frame, (x1, y1), (x1, y1 + lw), color, 4)
+            # Sup Der
+            cv2.line(frame, (x2, y1), (x2 - lw, y1), color, 4)
+            cv2.line(frame, (x2, y1), (x2, y1 + lw), color, 4)
+            # Inf Izq
+            cv2.line(frame, (x1, y2), (x1 + lw, y2), color, 4)
+            cv2.line(frame, (x1, y2), (x1, y2 - lw), color, 4)
+            # Inf Der
+            cv2.line(frame, (x2, y2), (x2 - lw, y2), color, 4)
+            cv2.line(frame, (x2, y2), (x2, y2 - lw), color, 4)
+
+        end_time = time.time()
+        fps = 1 / (end_time - start_time)
+
+        # Enviar datos al backend
+        try:
+            requests.post(render_url, json={
+                "person": counts["person"],
+                "vehicle": counts["vehicle"],
+                "others": counts["others"],
+                "fps": round(fps, 2)
+            })
+        except Exception as e:
+            print("[ERROR] No se pudo enviar a la API:", e)
+
+        return {
             "person": counts["person"],
             "vehicle": counts["vehicle"],
             "others": counts["others"],
             "fps": round(fps, 2)
-        })
+        }
