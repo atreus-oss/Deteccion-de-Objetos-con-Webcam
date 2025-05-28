@@ -1,4 +1,5 @@
 let apiUrlBase = null;
+let currentStream = null;
 
 // Función para construir URL sin doble slash
 function buildUrl(path) {
@@ -20,9 +21,6 @@ fetch("/api/url")
 
     console.log("La URL segura es:", apiUrlBase);
 
-    // No usamos /video_feed porque Render no tiene cámara
-    // document.getElementById("camFeed").src = buildUrl("/video_feed");
-
     actualizarStats(); // Primera carga
     setInterval(actualizarStats, 1000); // Luego cada 1 segundo
   })
@@ -32,17 +30,38 @@ fetch("/api/url")
       "Error al obtener la URL del backend.";
   });
 
-// Mostrar video local desde la cámara del navegador
-navigator.mediaDevices.getUserMedia({ video: true })
-  .then(function (stream) {
-    const video = document.getElementById("camFeed");
-    video.srcObject = stream;
-  })
-  .catch(function (err) {
-    console.log("No se pudo acceder a la cámara: ", err);
-    document.getElementById("errorMsg").textContent =
-      "No se pudo acceder a la cámara.";
-  });
+// Cambiar cámara
+function detenerStreamActual() {
+  if (currentStream) {
+    currentStream.getTracks().forEach(track => track.stop());
+    currentStream = null;
+  }
+}
+
+function usarCamara(facingMode = "user") {
+  detenerStreamActual();
+
+  const constraints = {
+    video: {
+      facingMode: { exact: facingMode }
+    }
+  };
+
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(function (stream) {
+      const video = document.getElementById("camFeed");
+      video.srcObject = stream;
+      currentStream = stream;
+    })
+    .catch(function (err) {
+      console.error("No se pudo acceder a la cámara:", err);
+      document.getElementById("errorMsg").textContent =
+        "No se pudo acceder a la cámara (" + facingMode + ")";
+    });
+}
+
+// Iniciar con cámara frontal por defecto
+usarCamara("user");
 
 // Consultar estadísticas en el backend
 async function actualizarStats() {
