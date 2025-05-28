@@ -1,43 +1,44 @@
-<!--Para ejecutar el html: python -m http.server 8080 // para acceder a él: http://localhost:8080/index.html-->
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Monitor de Detección</title>
-        <link rel="stylesheet" href="/css/index.css">
-    </head>
-    <body>
-        <header>Monitoreo de Detección de Objetos</header>
-        <div class="stats">
-            <div class="card">
-                <h3>Personas</h3>
-                <p id="personCount">0</p>
-            </div>
-            <div class="card">
-                <h3>Vehículos</h3>
-                <p id="vehicleCount">0</p>
-            </div>
-            <div class="card">
-                <h3>Otros</h3>
-                <p id="othersCount">0</p>
-            </div>
-            <div class="card">
-                <h3>FPS</h3>
-                <p id="fpsCount">0</p>
-            </div>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitor de Detección</title>
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+    <header>Monitoreo de Detección de Objetos</header>
+
+    <div class="stats">
+        <div class="card">
+            <h3>Personas</h3>
+            <p id="personCount">0</p>
         </div>
-        
-        <h3>Video en vivo desde cámara</h3>
-        <video id="camFeed" autoplay playsinline style="max-width: 90%; border: 2px solid #333;"></video>
-
-        <div id="errorMsg" style="color: red; font-weight: bold;"></div>
-
-        <div style="margin: 1em 0; text-align: center;">
-            <button onclick="usarCamara('user')">Cámara Frontal</button>
-            <button onclick="usarCamara('environment')">Cámara Trasera</button>
+        <div class="card">
+            <h3>Vehículos</h3>
+            <p id="vehicleCount">0</p>
         </div>
+        <div class="card">
+            <h3>Otros</h3>
+            <p id="othersCount">0</p>
+        </div>
+        <div class="card">
+            <h3>FPS</h3>
+            <p id="fpsCount">0</p>
+        </div>
+    </div>
 
-        <script src="/js/script.js"></script>
-    </body>
+    <h3>Video en vivo desde la cámara</h3>
+    <video id="camFeed" autoplay playsinline style="max-width: 90%; border: 2px solid #333;"></video>
+
+    <div id="errorMsg" style="color: red; font-weight: bold; margin-top: 1em;"></div>
+
+    <!-- Botones para cambiar de cámara -->
+    <div style="margin: 1em 0; text-align: center;">
+        <button onclick="usarCamara('user')">📱 Cámara Frontal</button>
+        <button onclick="usarCamara('environment')">📷 Cámara Trasera</button>
+    </div>
+
+    <script src="/js/script.js"></script>
+</body>
 </html>

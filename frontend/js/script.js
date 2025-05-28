@@ -19,7 +19,7 @@ fetch("/api/url")
       throw new Error("La URL está vacía o indefinida");
     }
 
-    console.log("La URL segura es:", apiUrlBase);
+    console.log("✅ API conectada:", apiUrlBase);
 
     actualizarStats(); // Primera carga
     setInterval(actualizarStats, 1000); // Luego cada 1 segundo
@@ -30,7 +30,7 @@ fetch("/api/url")
       "Error al obtener la URL del backend.";
   });
 
-// Cambiar cámara
+// Detener stream anterior si existe
 function detenerStreamActual() {
   if (currentStream) {
     currentStream.getTracks().forEach(track => track.stop());
@@ -38,13 +38,12 @@ function detenerStreamActual() {
   }
 }
 
+// Activar una cámara: "user" = frontal, "environment" = trasera
 function usarCamara(facingMode = "user") {
   detenerStreamActual();
 
   const constraints = {
-    video: {
-      facingMode: { exact: facingMode }
-    }
+    video: { facingMode: facingMode }
   };
 
   navigator.mediaDevices.getUserMedia(constraints)
@@ -52,18 +51,19 @@ function usarCamara(facingMode = "user") {
       const video = document.getElementById("camFeed");
       video.srcObject = stream;
       currentStream = stream;
+      console.log(`📷 Cámara ${facingMode} activada`);
     })
     .catch(function (err) {
-      console.error("No se pudo acceder a la cámara:", err);
+      console.error(`❌ No se pudo acceder a la cámara (${facingMode}):`, err);
       document.getElementById("errorMsg").textContent =
         "No se pudo acceder a la cámara (" + facingMode + ")";
     });
 }
 
-// Iniciar con cámara frontal por defecto
+// Iniciar con cámara frontal
 usarCamara("user");
 
-// Consultar estadísticas en el backend
+// Consultar estadísticas del backend
 async function actualizarStats() {
   if (!apiUrlBase) return;
 

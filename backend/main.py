@@ -66,7 +66,7 @@ def update_stats(data: StatsUpdate):
 def get_private_url():
     if not render_url:
         raise HTTPException(status_code=500, detail="Variable RENDER_URL no definida.")
-    return JSONResponse(content={"url": render_url})
+    return {"url": render_url}
 
 @app.get("/api/datos")
 def get_secure_data():
